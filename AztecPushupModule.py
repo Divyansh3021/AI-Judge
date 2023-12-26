@@ -21,7 +21,7 @@ class AztecPushupCounter:
         # self.mp_pose = mp.solutions.pose
 
     def process_frame(self, frame):
-
+        status = ""
         image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         results = self.pose.process(image)
         frame_width, frame_height, _ = frame.shape
@@ -118,7 +118,7 @@ class AztecPushupCounter:
                             #         flag = True
                     
 
-                            if self.current_state and self.show_annotations: cv2.putText(frame, "Current state: "+current_state, (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 45, 255), 2)
+                            if self.current_state and self.show_annotations: cv2.putText(frame, "Current state: "+self.current_state, (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 45, 255), 2)
 
                             if (self.prev_state == "s3" and self.current_state == "s1"):
                                 self.count+=1
@@ -144,6 +144,6 @@ class AztecPushupCounter:
         # cv2.putText(frame, "Ankle: " + str(left_ankle.y), (10, 220), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 0, 255), 2)
         # cv2.putText(frame, "Wrist: " + str(left_wrist.y), (10,260), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 0), 2)
 
-        self.feedback and self.show_annotations and cv2.putText(frame, self.feedback, (10, 120), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0) if feedback == "Perfect" else (255, 0, 0), 2)
+        self.feedback and self.show_annotations and cv2.putText(frame, self.feedback, (10, 120), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0) if self.feedback == "Perfect" else (255, 0, 0), 2)
         print("print4")
         return frame

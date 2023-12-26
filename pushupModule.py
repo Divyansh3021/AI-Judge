@@ -15,6 +15,7 @@ class PushupCounter:
         self.show_annotations = True
         self.record = []
         self.flag = False
+        self.tag = ""
 
     def process_frame(self, frame):
         image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -66,11 +67,11 @@ class PushupCounter:
                             self.current_state = self.states[0]
 
                             if self.flag:
-                                status = tag
+                                status = self.tag
                             else:
                                 status = "good"
 
-                        elif self.vert_elbow_shoulder[0] >= vert_elbow_shoulder_angle >= self.self.vert_elbow_shoulder[1] :
+                        elif self.vert_elbow_shoulder[0] >= vert_elbow_shoulder_angle >= self.vert_elbow_shoulder[1] :
                             self.current_state = self.states[0]
 
                         # elif self.vert_elbow_shoulder[1] > vert_elbow_shoulder_angle > self.vert_elbow_shoulder[2] and self.prev_state == "s1":
@@ -79,7 +80,7 @@ class PushupCounter:
                         elif self.vert_elbow_shoulder[2] > vert_elbow_shoulder_angle >= self.vert_elbow_shoulder[3]  and self.prev_state == "s1" :
                             self.current_state = self.states[1]
 
-                        elif current_state == "s1" and self.prev_state == "s3" :
+                        elif self.current_state == "s1" and self.prev_state == "s3" :
                             self.show_annotations and cv2.putText(frame, "Go Low!!", (10, 200), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
 
                         else:
@@ -87,27 +88,27 @@ class PushupCounter:
                             if (shoulder_hip_ankle_angle < self.shoulder_hip_ankle[0]) :
                                 cv2.putText(frame, "Keep your hip low!!", (10, 200), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
                                 self.flag = True
-                                tag = "hip high"
+                                self.tag = "hip high"
                             
                             elif (shoulder_hip_ankle_angle > self.shoulder_hip_ankle[1]) :
                                 cv2.putText(frame, "Keep your hip high!!", (10, 200), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
                                 self.flag = True
-                                tag = "hip low"
+                                self.tag = "hip low"
                         print("print2")
-                        if current_state and self.show_annotations:
-                            cv2.putText(frame, 'Current state: ' + current_state, (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
+                        if self.current_state and self.show_annotations:
+                            cv2.putText(frame, 'Current state: ' + self.current_state, (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
 
                         self.show_annotations and cv2.putText(frame, f'Vertical elbow shoulder angle: {vert_elbow_shoulder_angle} ', (10, 260), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
                         self.show_annotations and cv2.putText(frame, f'Shoulder_hip_ankle angle: {shoulder_hip_ankle_angle} ', (10, 180), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
 
-                        if self.prev_state == "s2" and current_state == "s1":
+                        if self.prev_state == "s2" and self.current_state == "s1":
                             self.count += 1
                             self.prev_state = None 
 
                             if self.record_exercise:
                                 self.record.append(status)
 
-                        self.prev_state = current_state
+                        self.prev_state = self.current_state
 
                         cv2.putText(frame, "Count: " + str(self.count), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 2)
 

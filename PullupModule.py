@@ -13,7 +13,8 @@ class PullupCounter:
         self.record = []
         self.flag = False
         self.body_to_screen_ratio,self.elbow_shoulder_hip, self.shoulder_hip_ankle = utils.pullup_thresholds()
-
+        self.ankle_y = [0,0]
+        self.height = 0
 
     def process_frame(self, frame):
         image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -99,7 +100,7 @@ class PullupCounter:
                         if ((self.elbow_shoulder_hip[0] >= left_elbow_shoulder_hip_angle >= self.elbow_shoulder_hip[1]) and
                             (self.elbow_shoulder_hip[0] >= right_elbow_shoulder_hip_angle >= self.elbow_shoulder_hip[1])) and (self.prev_state == "s2"):
                             self.current_state = self.states[0]
-                            ankle_y = [left_ankle.y, right_ankle.y]
+                            self.ankle_y = [left_ankle.y, right_ankle.y]
 
                             if self.flag:
                                 status = self.tag
@@ -109,11 +110,11 @@ class PullupCounter:
                         elif ((self.elbow_shoulder_hip[0]>= left_elbow_shoulder_hip_angle>= self.elbow_shoulder_hip[1]) and (self.elbow_shoulder_hip[0]>= right_elbow_shoulder_hip_angle>= self.elbow_shoulder_hip[1])):
                             # current_state = states[0]   #Current state = s1
                             self.current_state = self.states[0]
-                            ankle_y = [left_ankle.y, right_ankle.y]
-                            height = utils.distance(left_shoulder, left_knee)
+                            self.ankle_y = [left_ankle.y, right_ankle.y]
+                            self.height = utils.distance(left_shoulder, left_knee)
 
                         elif ((self.elbow_shoulder_hip[1] > left_elbow_shoulder_hip_angle >= self.elbow_shoulder_hip[2]) and
-                            (self.elbow_shoulder_hip[1] > right_elbow_shoulder_hip_angle >= self.elbow_shoulder_hip[2])) and (self.prev_state == "s1") and (left_ankle.y < ankle_y[0] and right_ankle.y < ankle_y[1]) and (abs(height - (math.sqrt((left_shoulder.x - left_knee.x)**2 + (left_shoulder.y - left_knee.y)**2))) < height/10):
+                            (self.elbow_shoulder_hip[1] > right_elbow_shoulder_hip_angle >= self.elbow_shoulder_hip[2])) and (self.prev_state == "s1") and (left_ankle.y < self.ankle_y[0] and right_ankle.y < self.ankle_y[1]) and (abs(self.height - (math.sqrt((left_shoulder.x - left_knee.x)**2 + (left_shoulder.y - left_knee.y)**2))) < self.height/10):
                             self.current_state = self.states[1]  # current state = s2
 
                         else:
@@ -124,10 +125,10 @@ class PullupCounter:
                                 self.flag = True
                                 tag = "Arms too close"
                         
-                        if current_state and self.show_annotations:
+                        if self.current_state and self.show_annotations:
                             cv2.putText(frame, 'Current state: '+ self.current_state, (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
 
-                        if (self.prev_state == "s2" and current_state == "s1"):
+                        if (self.prev_state == "s2" and self.current_state == "s1"):
                             self.count+=1
                             self.prev_state = None 
 
