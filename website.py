@@ -33,7 +33,7 @@ ctx = webrtc_streamer(
                         key="Squats-pose-analysis",
                         video_frame_callback=video_frame_callback,
                         rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},  # Add this config
-                        media_stream_constraints={"video": {"width":1920, "height":1080}, "audio": False},
+                        media_stream_constraints={"video": {"width":1080, "height":720}, "audio": False},
                         video_html_attrs=VideoHTMLAttributes(autoPlay=True, controls=False, muted=False, width="100%", height = "100%"),
                         out_recorder_factory=out_recorder_factory
                     )
